@@ -3,13 +3,41 @@ const bodyParser = require('body-parser');
 const Datastore = require('nedb');
 
 const app = express();
-const db = new Datastore({ filename: 'database.db', autoload: true });
-
+const db = new Datastore({ filename: 'reporteador.db', autoload: true });
 // Utilizamos el middleware de bodyParser para parsear JSON
 app.use(bodyParser.json());
 
-// Ruta para recibir JSON genérico
-app.post('/receive-json', (req, res) => {
+app.get('/tipo-sensor/reporte/:tipoId', (req, res) => {
+  const tipoId = req.params.tipoId;
+
+  db.find({TipoSensor:tipoId}, (err, records) => {
+    if (err) {
+      console.error('Error al obtener los datos por tipo de sensor:', err);
+      res.status(500).json({ message: 'Error al obtener los datos por tipo de sensor' });
+    } else {
+      console.log('datos recuperados:', records);
+      res.json(records);
+    }
+  });
+});
+
+
+app.get('/tipo-sensor/reporte-fecha/:fecha', (req, res) => {
+  const fecha = req.params.fecha;
+
+  db.find({Fecha:fecha}, (err, records) => {
+    if (err) {
+      console.error('Error al obtener los datos por fecha:', err);
+      res.status(500).json({ message: 'Error al obtener los datos por fecha' });
+    } else {
+      console.log('datos recuperados:', records);
+      res.json(records);
+    }
+  });
+});
+
+
+app.post('/tipo-sensor', (req, res) => {
   // Tu objeto JSON se encuentra ahora en req.body
   const receivedJSON = req.body;
 
@@ -28,6 +56,7 @@ app.post('/receive-json', (req, res) => {
 });
 
 // Iniciar el servidor en el puerto 3000
-app.listen(5000, () => {
-  console.log('Servidor iniciado en http://localhost:5000');
+const port=process.env.PORT ||  5000;
+app.listen(port, () => {
+  console.log(`Servidor iniciado en http://localhost:${port}`);
 });
