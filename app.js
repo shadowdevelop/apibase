@@ -22,10 +22,11 @@ app.get('/tipo-sensor/reporte/:tipoId', (req, res) => {
 });
 
 
-app.get('/tipo-sensor/reporte-fecha/:fecha', (req, res) => {
-  const fecha = req.params.fecha;
+app.get('/tipo-sensor/reporte-fecha/:fechaInicio/:fechaFin', (req, res) => {
+  const fechaIni = req.params.fechaInicio;
+  const fechaFin = req.params.fechaFin;
 
-  db.find({Fecha:fecha}, (err, records) => {
+  db.find({ $where: function () { return this.Fecha >= fechaIni && this.Fecha <= fechaFin; } }, (err, records) => {
     if (err) {
       console.error('Error al obtener los datos por fecha:', err);
       res.status(500).json({ message: 'Error al obtener los datos por fecha' });
